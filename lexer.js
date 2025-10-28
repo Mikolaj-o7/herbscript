@@ -6,8 +6,9 @@ export function tokenize(input) {
   const isDigit = (char) => /[0-9]/.test(char);
   const skipWhitespace = () => { while (/\s/.test(input[i])) i++; };
 
+  const BOOLEANS = ["true", "false"];
   const KEYWORDS = ["let", "const"];
-  const TYPES = ["number", "string", "boolean", "void"];
+  const TYPES = ["number", "string", "bool", "void"];
 
   while (i < input.length) {
     skipWhitespace();
@@ -24,6 +25,8 @@ export function tokenize(input) {
         tokens.push({ type: word.toUpperCase(), value: word });
       } else if (TYPES.includes(word)) {
         tokens.push({ type: "TYPE", value: word });
+      } else if (BOOLEANS.includes(word)) {
+        tokens.push({ type: "BOOLEAN", value: word });
       } else {
         tokens.push({ type: "IDENT", value: word });
       }

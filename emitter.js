@@ -27,6 +27,7 @@ function emitExpr(node) {
   switch (node.type) {
     case "NumberLiteral": return node.value;
     case "StringLiteral": return `"${node.value}"`;
+    case "BooleanLiteral": return node.value;
     case "Identifier": return node.name;
     case "BinaryExpression":
       return `${emitExpr(node.left)} ${node.operator} ${emitExpr(node.right)}`;

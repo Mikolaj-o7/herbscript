@@ -7,3 +7,6 @@ a = 10;
 
 let d: number = b + c;
 let e: number = a + 1;
+
+let f: bool = true;
+f = false;

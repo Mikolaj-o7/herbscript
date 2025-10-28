@@ -17,6 +17,7 @@ export function parse(tokens) {
     if (token.type === "NUMBER") { i++; return { type: "NumberLiteral", value: Number(token.value) }; }
     if (token.type === "STRING") { i++; return { type: "StringLiteral", value: token.value }; }
     if (token.type === "IDENT") { i++; return { type: "Identifier", name: token.value }; }
+    if (token.type === "BOOLEAN") { i++; return { type: "BooleanLiteral", value: token.value }; }
 
     throw new Error(`Unexpected token: ${token.type}`);
   }

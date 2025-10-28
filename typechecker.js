@@ -7,6 +7,7 @@ export function checkTypes(ast) {
     switch (node.type) {
       case "NumberLiteral": return "number";
       case "StringLiteral": return "string";
+      case "BooleanLiteral": return "bool";
       case "Identifier": {
         const entry = env.get(node.name);
         if (!entry) throw new Error(`Variable '${node.name}' not declared`);
