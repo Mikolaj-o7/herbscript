@@ -2,6 +2,8 @@ let a: number;
 let b: number = 5;
 let c: number = b + 2;
 
+b = b + 10;
+a = 10;
+
 let d: number = b + c;
 let e: number = a + 1;
-let f: number = "hello";

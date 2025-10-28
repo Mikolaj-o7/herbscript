@@ -45,7 +45,6 @@ export function parse(tokens) {
 
     let value = null;
 
-    // optional initialization
     if (peek() && peek().type === "EQUAL") {
       consume("EQUAL");
       value = parseExpression();
@@ -56,10 +55,22 @@ export function parse(tokens) {
     return { type: "VariableDeclaration", name, varType: type, value };
   };
 
+  const parseAssignment = () => {
+    const token = consume("IDENT");
+    const name = token.value;
+
+    consume("EQUAL");
+    const value = parseExpression();
+    consume("SEMICOLON");
+
+    return { type: "AssignmentExpression", name, value };
+  }
+
   const body = [];
 
   while (i < tokens.length) {
     if (peek().type === "LET") body.push(parseVariableDeclaration());
+    else if (peek().type === "IDENT") body.push(parseAssignment());
     else throw new Error(`Unexpected token: ${peek().type}`);
   }
 
