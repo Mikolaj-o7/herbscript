@@ -2,7 +2,11 @@ export function emit(ast) {
   let out = "";
   for (const stmt of ast.body) {
     if (stmt.type === "VariableDeclaration") {
-      out += `let ${stmt.name} = ${emitExpr(stmt.value)};\n`;
+      if (stmt.value) {
+        out += `let ${stmt.name} = ${emitExpr(stmt.value)};\n`;
+      } else {
+        out += `let ${stmt.name};\n`;
+      }
     }
   }
   return out;

@@ -1,2 +1,3 @@
 let x: number = 5;
-let y: number = "siema";
+let y: string = "siema";
+let z: number;

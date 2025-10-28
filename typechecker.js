@@ -2,6 +2,8 @@ export function checkTypes(ast) {
   const env = new Map();
 
   function infer(node) {
+    if (!node) return null;
+
     switch (node.type) {
       case "NumberLiteral": return "number";
       case "StringLiteral": return "string";
@@ -12,16 +14,22 @@ export function checkTypes(ast) {
         if (lt !== rt) throw new Error(`Type error: ${lt} ${node.operator} ${rt}`);
         return lt;
       }
-      default: throw new Error(`Unknown node's type ${node.type}`);
+      default:
+        throw new Error(`Unknown node type: ${node?.type}`);
     }
   }
 
   for (const stmt of ast.body) {
     if (stmt.type === "VariableDeclaration") {
-      const valType = infer(stmt.value);
-      if (stmt.varType !== valType) {
-        throw new Error(`Type error: ${stmt.name} is of ${stmt.varType} type, but provided ${valType}`);
+      if (stmt.value) {
+        const valType = infer(stmt.value);
+        if (stmt.varType !== valType) {
+          throw new Error(
+            `Type error: variable '${stmt.name}' declared as ${stmt.varType}, but assigned ${valType}`
+          );
+        }
       }
+
       env.set(stmt.name, stmt.varType);
     }
   }

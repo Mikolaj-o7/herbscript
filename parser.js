@@ -38,12 +38,23 @@ export function parse(tokens) {
     const name = consume("IDENT").value;
     consume("COLON");
     const type = consume("TYPE").value;
-    consume("EQUAL");
-    const value = parseExpression();
+    
+    if (type === "void") {
+      throw new Error("Variables cannot be of void type.");
+    }
+
+    let value = null;
+
+    // optional initialization
+    if (peek() && peek().type === "EQUAL") {
+      consume("EQUAL");
+      value = parseExpression();
+    }
+
     consume("SEMICOLON");
 
     return { type: "VariableDeclaration", name, varType: type, value };
-  }
+  };
 
   const body = [];
 
