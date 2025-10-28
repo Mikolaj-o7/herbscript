@@ -8,5 +8,5 @@ a = 10;
 let d: number = b + c;
 let e: number = a + 1;
 
-let f: bool = true;
+let f: bool = 1 < 3;
 f = false;

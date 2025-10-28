@@ -17,8 +17,30 @@ export function checkTypes(ast) {
       case "BinaryExpression": {
         const lt = infer(node.left);
         const rt = infer(node.right);
-        if (lt !== rt) throw new Error(`Type error: ${lt} ${node.operator} ${rt}`);
-        return lt;
+        const op = node.operator;
+
+        // Arithmetic
+        if (["+", "-", "*", "/"].includes(op)) {
+          if (lt !== "number" || rt !== "number")
+            throw new Error(`Type error: arithmetic '${op}' requires number operands`);
+          return "number";
+        }
+
+        // Comparison
+        if (["<", ">", "<=", ">="].includes(op)) {
+          if (lt !== "number" || rt !== "number")
+            throw new Error(`Type error: comparison '${op}' requires number operands`);
+          return "bool";
+        }
+
+        // Equality
+        if (["==", "!="].includes(op)) {
+          if (lt !== rt)
+            throw new Error(`Type error: cannot compare ${lt} and ${rt}`);
+          return "bool";
+        }
+
+        throw new Error(`Unknown operator: ${op}`);
       }
       case "AssignmentExpression": {
         const entry = env.get(node.name);

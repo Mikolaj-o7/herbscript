@@ -16,23 +16,73 @@ export function parse(tokens) {
 
     if (token.type === "NUMBER") { i++; return { type: "NumberLiteral", value: Number(token.value) }; }
     if (token.type === "STRING") { i++; return { type: "StringLiteral", value: token.value }; }
+    if (token.type === "BOOLEAN") { i++; return { type: "BooleanLiteral", value: token.value === "true" }; }
     if (token.type === "IDENT") { i++; return { type: "Identifier", name: token.value }; }
-    if (token.type === "BOOLEAN") { i++; return { type: "BooleanLiteral", value: token.value }; }
 
-    throw new Error(`Unexpected token: ${token.type}`);
-  }
+    if (token.type === "LPAREN") {
+      consume("LPAREN");
+      const expr = parseExpression();
+      consume("RPAREN");
+      return expr;
+    }
 
-  const parseExpression = () => {
+    throw new Error(`Unexpected token in primary: ${token.type}`);
+  };
+
+  // Parse * and / first
+  const parseMultiplicative = () => {
     let left = parsePrimary();
 
-    while (peek() && ["PLUS", "MINUS"].includes(peek().type)) {
+    while (peek() && ["STAR", "SLASH"].includes(peek().type)) {
       const op = consume(peek().type).value;
       const right = parsePrimary();
       left = { type: "BinaryExpression", operator: op, left, right };
     }
-    
+
     return left;
   };
+
+  // Then + and -
+  const parseAdditive = () => {
+    let left = parseMultiplicative();
+
+    while (peek() && ["PLUS", "MINUS"].includes(peek().type)) {
+      const op = consume(peek().type).value;
+      const right = parseMultiplicative();
+      left = { type: "BinaryExpression", operator: op, left, right };
+    }
+
+    return left;
+  };
+
+  // Then <, >, <=, >=
+  const parseComparison = () => {
+    let left = parseAdditive();
+
+    while (peek() && ["LT", "GT", "LTE", "GTE"].includes(peek().type)) {
+      const op = consume(peek().type).value;
+      const right = parseAdditive();
+      left = { type: "BinaryExpression", operator: op, left, right };
+    }
+
+    return left;
+  };
+
+  // Then ==, !=
+  const parseEquality = () => {
+    let left = parseComparison();
+
+    while (peek() && ["EQEQ", "NOTEQ"].includes(peek().type)) {
+      const op = consume(peek().type).value;
+      const right = parseComparison();
+      left = { type: "BinaryExpression", operator: op, left, right };
+    }
+
+    return left;
+  };
+
+  // Entry point
+  const parseExpression = () => parseEquality();
 
   const parseVariableDeclaration = () => {
     const keyword = consume(peek().type); // LET or CONST

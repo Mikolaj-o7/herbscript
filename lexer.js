@@ -57,8 +57,33 @@ export function tokenize(input) {
       "+": "PLUS",
       "-": "MINUS",
       "*": "STAR",
-      "/": "SLASH"
+      "/": "SLASH",
+      "(": "LPAREN",
+      ")": "RPAREN",
+      "{": "LBRACE",
+      "}": "RBRACE",
+      "<": "LT",
+      ">": "GT",
+      "!": "BANG",
+      "&": "AMP",
+      "|": "BAR",
     };
+
+    const DOUBLE = {
+      "==": "EQEQ",
+      "!=": "NOTEQ",
+      "<=": "LTE",
+      ">=": "GTE",
+      "&&": "AND",
+      "||": "OR",
+    };
+
+    const twoChar = input.slice(i, i + 2);
+    if (DOUBLE[twoChar]) {
+      tokens.push({ type: DOUBLE[twoChar], value: twoChar });
+      i += 2;
+      continue;
+    }
 
     if (SINGLE[char]) {
       tokens.push({ type: SINGLE[char], value: char });
