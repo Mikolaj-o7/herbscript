@@ -1,3 +1,7 @@
-let x: number = 5;
-let y: string = "siema";
-let z: number;
+let a: number;
+let b: number = 5;
+let c: number = b + 2;
+
+let d: number = b + c;
+let e: number = a + 1;
+let f: number = "hello";

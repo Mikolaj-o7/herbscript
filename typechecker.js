@@ -7,7 +7,12 @@ export function checkTypes(ast) {
     switch (node.type) {
       case "NumberLiteral": return "number";
       case "StringLiteral": return "string";
-      case "Identifier": return env.get(node.name);
+      case "Identifier": {
+        const entry = env.get(node.name);
+        if (!entry) throw new Error(`Variable '${node.name}' not declared`);
+        if (!entry.initialized) throw new Error(`Variable '${node.name}' used before assignment`);
+        return entry.type;
+      }
       case "BinaryExpression": {
         const lt = infer(node.left);
         const rt = infer(node.right);
@@ -30,7 +35,7 @@ export function checkTypes(ast) {
         }
       }
 
-      env.set(stmt.name, stmt.varType);
+      env.set(stmt.name, { type: stmt.varType, initialized: !!stmt.value });
     }
   }
 }
