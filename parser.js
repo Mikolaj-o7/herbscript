@@ -34,11 +34,12 @@ export function parse(tokens) {
   };
 
   const parseVariableDeclaration = () => {
-    consume("LET");
+    const keyword = consume(peek().type); // LET or CONST
+    const isConst = keyword.type === "CONST";
     const name = consume("IDENT").value;
     consume("COLON");
     const type = consume("TYPE").value;
-    
+
     if (type === "void") {
       throw new Error("Variables cannot be of void type.");
     }
@@ -52,7 +53,17 @@ export function parse(tokens) {
 
     consume("SEMICOLON");
 
-    return { type: "VariableDeclaration", name, varType: type, value };
+    if (isConst && !value) {
+      throw new Error(`Const variable '${name}' must be initialized`);
+    }
+
+    return {
+      type: "VariableDeclaration",
+      name,
+      varType: type,
+      value,
+      isConst
+    };
   };
 
   const parseAssignment = () => {
@@ -69,9 +80,15 @@ export function parse(tokens) {
   const body = [];
 
   while (i < tokens.length) {
-    if (peek().type === "LET") body.push(parseVariableDeclaration());
-    else if (peek().type === "IDENT") body.push(parseAssignment());
-    else throw new Error(`Unexpected token: ${peek().type}`);
+    if (peek().type === "LET" || peek().type === "CONST") {
+      body.push(parseVariableDeclaration());
+    }
+    else if (peek().type === "IDENT") {
+      body.push(parseAssignment());
+    }
+    else {
+      throw new Error(`Unexpected token: ${peek().type}`);
+    }
   }
 
   return { type: "Program", body };

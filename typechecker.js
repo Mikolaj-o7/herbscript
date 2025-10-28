@@ -36,7 +36,11 @@ export function checkTypes(ast) {
 
   for (const stmt of ast.body) {
     switch (stmt.type) {
-      case "VariableDeclaration":
+      case "VariableDeclaration": {
+        if (env.has(stmt.name)) {
+          throw new Error(`Variable '${stmt.name}' is already declared`);
+        }
+
         if (stmt.value) {
           const valType = infer(stmt.value);
           if (stmt.varType !== valType) {
@@ -45,12 +49,25 @@ export function checkTypes(ast) {
             );
           }
         }
-        env.set(stmt.name, { type: stmt.varType, initialized: !!stmt.value });
-        break;
 
-      case "AssignmentExpression":
-        infer(stmt); // calls the case in infer() above
+        env.set(stmt.name, {
+          type: stmt.varType,
+          initialized: !!stmt.value,
+          isConst: stmt.isConst
+        });
+
         break;
+      }
+
+      case "AssignmentExpression": {
+        const entry = env.get(stmt.name);
+        if (!entry) throw new Error(`Variable '${stmt.name}' not declared`);
+        if (entry.isConst)
+          throw new Error(`Cannot reassign to constant variable '${stmt.name}'`);
+
+        infer(stmt); // will handle type checking inside
+        break;
+      }
 
       default:
         throw new Error(`Unknown statement type: ${stmt.type}`);

@@ -5,9 +5,9 @@ export function emit(ast) {
     switch (stmt.type) {
       case "VariableDeclaration":
         if (stmt.value) {
-          out += `let ${stmt.name} = ${emitExpr(stmt.value)};\n`;
+          out += `${stmt.isConst ? "const" : "let"} ${stmt.name} = ${emitExpr(stmt.value)};\n`;
         } else {
-          out += `let ${stmt.name};\n`;
+          out += `${stmt.isConst ? "const" : "let"} ${stmt.name};\n`;
         }
         break;
 
